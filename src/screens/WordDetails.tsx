@@ -26,7 +26,16 @@ type Props = {
 const WordDetails: React.FC<Props> = ({navigation, route}) => {
   const {data} = useWord(route.params.date);
 
-  const {word, examples, translation, link, guessed, date} = data as IWord;
+  const {
+    word,
+    examples,
+    translation,
+    link,
+    guessed,
+    date,
+    difficulty,
+    pinyin,
+  } = data as IWord;
 
   useFocusEffect(
     React.useCallback(() => {
@@ -35,13 +44,11 @@ const WordDetails: React.FC<Props> = ({navigation, route}) => {
           isSameDay(new Date(), new Date(date)) ? (
             <Div>
               <Button
-                disabled={guessed}
                 bg="white"
                 color="black"
                 onPress={() =>
                   navigation.navigate('LearnWord', {
-                    translation,
-                    word,
+                    word: data as IWord,
                   })
                 }>
                 Learn
@@ -57,13 +64,17 @@ const WordDetails: React.FC<Props> = ({navigation, route}) => {
       <Div mx={15} my={10}>
         <Surface>
           <Div row alignItems="flex-start" justifyContent="space-between">
-            <Text fontSize="6xl">{translation}</Text>
+            <Text fontSize="6xl" mb={5}>
+              {translation}
+            </Text>
             {guessed ? (
               <Tag
                 ml="md"
                 bg="green400"
                 color="white"
                 fontSize="md"
+                position="absolute"
+                right={5}
                 suffix={
                   <Icon ml={'md'} name="check" color="white" fontSize="sm" />
                 }>
@@ -73,6 +84,10 @@ const WordDetails: React.FC<Props> = ({navigation, route}) => {
           </Div>
           <Text fontSize="2xl">{word}</Text>
           <Div my={20}>
+            <Text color="gray600">Difficulty: {difficulty}</Text>
+            <Text color="gray600">Pinyin: {pinyin}</Text>
+          </Div>
+          <Div my={10}>
             <Text
               fontWeight="500"
               textTransform="uppercase"

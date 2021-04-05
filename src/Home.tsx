@@ -6,6 +6,7 @@ import {TouchableOpacity} from 'react-native';
 import {Div, Text} from 'react-native-magnus';
 import {useDailyWord} from './hooks/useDailyWord';
 import {RootStackProps, TabsProps} from './router/RootNavigation';
+import {initiallyPopulateDatabase} from './scripts/initialDataLoad';
 
 type HomeProps = CompositeNavigationProp<
   BottomTabNavigationProp<TabsProps, 'Home'>,

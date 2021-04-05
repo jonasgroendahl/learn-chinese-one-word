@@ -1,13 +1,16 @@
 import {CompositeNavigationProp, RouteProp} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import React, {useState} from 'react';
-import {Alert} from 'react-native';
+import {Alert, Dimensions} from 'react-native';
 import {Div, Input, Text} from 'react-native-magnus';
 import {useQueryClient} from 'react-query';
 import {apiUpdateWordGuessed} from '../api/apiWords';
 import Button from '../Button';
+import PinyinStep from '../components/PinyinStep';
+import Step from '../components/Step';
+import StepContainer from '../components/StepContainer';
 import Surface from '../components/Surface';
-import {RootStackProps} from '../router/RootNavigation';
+import Navigation, {RootStackProps} from '../router/RootNavigation';
 import {WordStackProps} from '../router/WordStack';
 
 type Props = {
@@ -18,76 +21,89 @@ type Props = {
   route: RouteProp<WordStackProps, 'LearnWord'>;
 };
 
-const LearnWord: React.FC<Props> = ({route}) => {
+const LearnWord: React.FC<Props> = ({route, navigation}) => {
   const [step, setStep] = useState(0);
-  const [wordGuess, setWordGuess] = useState('');
-  const [translationGuess, setTranslationGuess] = useState('');
 
   const queryClient = useQueryClient();
 
-  const isCorrect = (): boolean => {
-    const {translation, word} = route.params;
-    return translation === translationGuess && word === wordGuess;
-  };
+  const {word} = route.params;
 
   const handleFinish = async () => {
-    if (!isCorrect()) {
-      try {
-        await apiUpdateWordGuessed();
-        queryClient.invalidateQueries('words');
-      } catch (e) {
-        Alert.alert('Error', e);
-      }
+    try {
+      await apiUpdateWordGuessed();
+      queryClient.invalidateQueries('words');
+      navigation.goBack();
+    } catch (e) {
+      Alert.alert('Error', e);
     }
-    setStep(2);
   };
 
   const renderStep = () => {
+    console.log('step', step);
     switch (step) {
       case 0:
         return (
-          <Surface>
-            <Text fontSize="4xl" fontWeight="bold">
-              Write the word.
-            </Text>
-            <Input
-              focusBorderColor="blue700"
-              autoFocus={true}
-              placeholder="Word"
-              value={wordGuess}
-              onChangeText={setWordGuess}
+          <StepContainer label="Repeat chinese word">
+            <Step
+              correctWord={word.translation}
+              keyword={word.translation}
+              onChange={() => setStep(1)}
             />
-            <Button onPress={() => setStep(1)}>Next</Button>
-          </Surface>
+          </StepContainer>
         );
       case 1:
         return (
-          <Surface>
-            <Text fontSize="4xl" fontWeight="bold">
-              Write the translation
-            </Text>
-            <Input
-              focusBorderColor="blue700"
-              autoFocus={true}
-              placeholder="Translation"
-              value={translationGuess}
-              onChangeText={setTranslationGuess}
-            />
-            <Button onPress={handleFinish}>Next</Button>
-          </Surface>
+          <StepContainer label="Repeat chinese word - no keyword">
+            <Div />
+            <Step correctWord={word.translation} onChange={() => setStep(2)} />
+          </StepContainer>
         );
       case 2:
-        const correct = isCorrect();
         return (
-          <Surface>
-            <Text>{correct ? 'Good job.' : 'Too bad. Try again.'}</Text>
-          </Surface>
+          <StepContainer label="Repeat pinyin">
+            <PinyinStep
+              pinyin={word.pinyin}
+              keyword={word.pinyin}
+              onChange={() => setStep(3)}
+            />
+          </StepContainer>
+        );
+      case 3:
+        return (
+          <StepContainer label="Repeat pinyin - no keyword">
+            <Div />
+            <PinyinStep pinyin={word.pinyin} onChange={() => setStep(4)} />
+          </StepContainer>
+        );
+      case 4:
+        return (
+          <StepContainer label="Repeat chinese word again">
+            <Step
+              correctWord={word.translation}
+              keyword={word.translation}
+              onChange={() => setStep(5)}
+            />
+          </StepContainer>
+        );
+      case 5:
+        return (
+          <StepContainer label="Repeat chinese word again - no keyword">
+            <Step correctWord={word.translation} onChange={() => setStep(6)} />
+          </StepContainer>
+        );
+      case 6:
+        return (
+          <StepContainer label="Well done!">
+            <Div justifyContent="center" row mt={30}>
+              <Button onPress={handleFinish}>Done</Button>
+            </Div>
+          </StepContainer>
         );
     }
   };
 
   return (
-    <Div m={15} rounded="md" shadow="md">
+    <Div bg="white" flex={1}>
       {renderStep()}
     </Div>
   );

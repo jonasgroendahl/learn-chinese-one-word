@@ -4,7 +4,7 @@ import {StackNavigationProp} from '@react-navigation/stack';
 import React from 'react';
 import {StyleSheet, TouchableOpacity} from 'react-native';
 import {FlatList} from 'react-native-gesture-handler';
-import {Div, Text} from 'react-native-magnus';
+import {Div, Icon, Text} from 'react-native-magnus';
 import {useWords} from './hooks/useWords';
 import {RootStackProps, TabsProps} from './router/RootNavigation';
 
@@ -48,8 +48,11 @@ const Course: React.FC<{navigation: Props}> = ({navigation}) => {
               <Text>{item.word}</Text>
               <Text>{item.translation}</Text>
             </Div>
-            <Div>
+            <Div row>
               <Text>{item.date}</Text>
+              {item.guessed ? (
+                <Icon name="check" color="green500" ml={10} />
+              ) : null}
             </Div>
           </Div>
         </TouchableOpacity>

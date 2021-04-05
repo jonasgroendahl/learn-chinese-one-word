@@ -3,14 +3,14 @@ import {createStackNavigator} from '@react-navigation/stack';
 import WordDetails from '../screens/WordDetails';
 import LearnWord from '../screens/LearnWord';
 import {Button, Icon} from 'react-native-magnus';
+import {IWord} from '../types';
 
 export type WordStackProps = {
   WordDetails: {
     date: string;
   };
   LearnWord: {
-    translation: string;
-    word: string;
+    word: IWord;
   };
 };
 

@@ -23,6 +23,14 @@ export const initiallyPopulateDatabase = async (startDate: Date) => {
   }
 };
 
+const clearDatabase = async () => {
+  const docs = await firestore().collection('word').get();
+
+  for (const doc of docs.docs) {
+    await doc.ref.delete();
+  }
+};
+
 //initiallyPopulateDatabase(new Date());
 
 // setup firebase for ios
